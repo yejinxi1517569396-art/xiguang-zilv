@@ -1,0 +1,24 @@
+{
+  "name": "xiguang-zilv",
+  "version": "1.0.0",
+  "private": true,
+  "description": "汐光自律是一款面向个人成长用户的自律打卡与复盘工具。",
+  "scripts": {
+    "dev": "npx serve .",
+    "start": "npx serve .",
+    "preview": "npx serve .",
+    "build": "node -e \"console.log('纯静态项目，无需构建。')\""
+  },
+  "keywords": [
+    "habit-tracker",
+    "self-discipline",
+    "daily-review",
+    "localStorage",
+    "static-site"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.2.4"
+  }
+}
