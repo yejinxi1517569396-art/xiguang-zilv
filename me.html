@@ -6,15 +6,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#F2F7FE">
   <title>汐光自律 · 我的</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="assets/icons/icon.svg">
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
   <main class="app-shell fade-in">
     <div class="profile-header">
       <div class="profile-avatar">🌸</div>
-      <div class="profile-name">汐光女孩</div>
-      <div class="profile-bio">愿你温柔且坚定地，向喜欢的方向生长</div>
+      <div class="profile-name" id="profileName">汐光女孩</div>
+      <div class="profile-bio" id="profileBio">愿你温柔且坚定地，向喜欢的方向生长</div>
     </div>
+
+    <!-- 账号状态 -->
+    <section class="card" id="accountCard"></section>
 
     <!-- 数据统计卡 -->
     <section class="card">
@@ -37,17 +42,61 @@
       </p>
       <div class="intro-feats">
         <div class="intro-feat">📋 每日打卡</div>
+        <div class="intro-feat">⭐ 自定义习惯</div>
         <div class="intro-feat">📝 每日复盘</div>
+        <div class="intro-feat">📅 周/月复盘</div>
         <div class="intro-feat">🪄 AI 复盘</div>
         <div class="intro-feat">🎯 AI 制定计划</div>
+        <div class="intro-feat">✨ 锦汐 AI 教练</div>
+        <div class="intro-feat">🌷 社区 · 点赞评论</div>
+        <div class="intro-feat">🏆 排行榜</div>
+        <div class="intro-feat">🤝 搭子互相监督</div>
+        <div class="intro-feat">💑 情侣打卡</div>
         <div class="intro-feat">📊 数据统计</div>
-        <div class="intro-feat">🌅 早起觉察</div>
       </div>
+    </section>
+
+    <!-- 我的功能 -->
+    <div class="section-title">我的功能</div>
+    <section class="menu-list">
+      <a class="menu-item" href="review.html" style="color:inherit">
+        <div class="menu-icon">📝</div>
+        <div class="menu-name">每日复盘</div>
+        <span class="menu-arrow">›</span>
+      </a>
+      <a class="menu-item" href="report.html" style="color:inherit">
+        <div class="menu-icon">📅</div>
+        <div class="menu-name">周复盘 / 月复盘</div>
+        <span class="menu-badge" style="background:var(--primary-bg);color:var(--primary-deep)">自动生成</span>
+        <span class="menu-arrow">›</span>
+      </a>
+      <a class="menu-item" href="ai.html" style="color:inherit">
+        <div class="menu-icon">🪄</div>
+        <div class="menu-name">AI 复盘 / AI 计划</div>
+        <span class="menu-arrow">›</span>
+      </a>
+      <a class="menu-item" href="coach.html" style="color:inherit">
+        <div class="menu-icon">✨</div>
+        <div class="menu-name">锦汐 AI 教练</div>
+        <span class="menu-badge" style="background:var(--accent-pink);color:#C16882">监督你</span>
+        <span class="menu-arrow">›</span>
+      </a>
+      <a class="menu-item" href="community.html" style="color:inherit">
+        <div class="menu-icon">🌷</div>
+        <div class="menu-name">社区 / 排行榜 / 搭子 / 情侣</div>
+        <span class="menu-arrow">›</span>
+      </a>
     </section>
 
     <!-- 设置 -->
     <div class="section-title">设置 · 数据</div>
     <section class="menu-list">
+      <div class="menu-item" id="authMenu">
+        <div class="menu-icon">👤</div>
+        <div class="menu-name" id="authMenuName">登录 / 注册</div>
+        <span class="menu-badge" id="authBadge">访客</span>
+        <span class="menu-arrow">›</span>
+      </div>
       <div class="menu-item" id="aiKeyMenu">
         <div class="menu-icon">🔑</div>
         <div class="menu-name">AI 接口设置</div>
@@ -69,12 +118,6 @@
     <!-- 即将推出 -->
     <div class="section-title">即将推出</div>
     <section class="menu-list">
-      <div class="menu-item" style="opacity:0.7">
-        <div class="menu-icon">👤</div>
-        <div class="menu-name">用户登录</div>
-        <span class="menu-badge" style="background:var(--primary-bg);color:var(--primary-deep)">即将上线</span>
-        <span class="menu-arrow">›</span>
-      </div>
       <div class="menu-item" style="opacity:0.7">
         <div class="menu-icon">☁️</div>
         <div class="menu-name">云端数据同步</div>
@@ -99,22 +142,43 @@
     <div class="modal">
       <div class="modal-title">🔑 AI 接口设置</div>
       <div class="modal-text">
-        填入 OpenAI API Key 后，AI 复盘 / AI 计划将调用真实的 GPT 模型。<br>
-        <span style="font-size:12px;color:var(--muted)">Key 仅保存在你的浏览器本地，不会上传。</span>
+        汐光自律支持 3 种 AI 模式，请按需选择。<br>
+        <span style="font-size:12px;color:var(--muted)">所有信息仅保存在你的浏览器本地，不会上传。</span>
       </div>
+
       <div class="field" style="margin-bottom:10px">
-        <label class="field-label">API Key</label>
+        <label class="field-label">AI 模式</label>
+        <select id="aiModeInput" style="background:var(--surface-2);border:1px solid var(--rule);border-radius:var(--r-md);padding:10px 12px;font-size:13px;outline:none">
+          <option value="auto">自动（优先后端代理）</option>
+          <option value="server">仅使用后端代理（推荐，安全）</option>
+          <option value="client">浏览器直连 OpenAI（需自带 Key）</option>
+          <option value="mock">仅本地示例（不调用真实 AI）</option>
+        </select>
+      </div>
+
+      <div class="field" style="margin-bottom:10px" id="serverUrlField">
+        <label class="field-label">后端代理地址</label>
+        <input type="text" id="aiServerUrlInput" placeholder="留空 = 使用当前网站的 /api/ai" style="background:var(--surface-2);border:1px solid var(--rule);border-radius:var(--r-md);padding:10px 12px;font-size:13px;outline:none">
+        <span style="font-size:11px;color:var(--muted);margin-top:4px">示例：https://your-app.vercel.app/api/ai</span>
+      </div>
+
+      <div class="field" style="margin-bottom:10px" id="keyField">
+        <label class="field-label">OpenAI API Key（仅"浏览器直连"模式需要）</label>
         <input type="password" id="aiKeyInput" placeholder="sk-..." style="background:var(--surface-2);border:1px solid var(--rule);border-radius:var(--r-md);padding:10px 12px;font-size:13px;outline:none">
       </div>
-      <div class="field" style="margin-bottom:10px">
+
+      <div class="field" style="margin-bottom:10px" id="baseField">
         <label class="field-label">API Base（可选，兼容代理 / 国内中转）</label>
         <input type="text" id="aiBaseInput" placeholder="https://api.openai.com/v1" style="background:var(--surface-2);border:1px solid var(--rule);border-radius:var(--r-md);padding:10px 12px;font-size:13px;outline:none">
       </div>
+
       <div class="field" style="margin-bottom:14px">
         <label class="field-label">模型</label>
         <input type="text" id="aiModelInput" placeholder="gpt-3.5-turbo" style="background:var(--surface-2);border:1px solid var(--rule);border-radius:var(--r-md);padding:10px 12px;font-size:13px;outline:none">
       </div>
+
       <div class="modal-actions">
+        <button class="btn-secondary" id="keyTest">测试连通</button>
         <button class="btn-secondary" id="keyCancel">取消</button>
         <button class="btn-primary" style="width:auto;padding:8px 18px" id="keySave">保存</button>
       </div>
@@ -125,6 +189,47 @@
   <script src="assets/js/ui.js"></script>
   <script>
     UI.injectShared('me');
+
+    const currentUser = App.auth.currentUser;
+    document.getElementById('profileName').textContent = currentUser ? currentUser.name : '汐光访客';
+    document.getElementById('profileBio').textContent = currentUser
+      ? `已登录：${currentUser.account}`
+      : '当前为访客模式，登录后可使用独立账号数据';
+
+    function renderAccountCard() {
+      const card = document.getElementById('accountCard');
+      if (currentUser) {
+        card.innerHTML = `
+          <div class="card-title">
+            <span class="card-title-text"><span class="icon"></span>账号中心</span>
+            <span class="card-action" id="logoutBtn">退出登录</span>
+          </div>
+          <div class="intro-text">
+            当前账号：<strong>${currentUser.name}</strong><br>
+            登录账号：${currentUser.account}<br>
+            你的打卡、复盘、AI 计划等数据会单独保存在这个账号下。
+          </div>
+        `;
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+          if (confirm('确定要退出登录吗？')) {
+            App.auth.logout();
+            App.toast('已退出登录');
+            setTimeout(() => location.reload(), 500);
+          }
+        });
+      } else {
+        card.innerHTML = `
+          <div class="card-title">
+            <span class="card-title-text"><span class="icon"></span>账号中心</span>
+            <a class="card-action" href="auth.html">去登录 →</a>
+          </div>
+          <div class="intro-text">
+            你正在使用访客模式。注册/登录后，系统会为你的账号创建独立的数据空间，适合长期记录自己的打卡和复盘。
+          </div>
+        `;
+      }
+    }
+    renderAccountCard();
 
     // 数据统计
     const week = App.weekStats();
@@ -171,23 +276,83 @@
 
     // 设置项
     function refreshKeyBadge() {
-      const has = !!App.data.settings.aiKey;
+      const s = App.data.settings;
       const badge = document.getElementById('aiKeyBadge');
-      badge.textContent = has ? '已配置' : '未配置';
-      badge.style.background = has ? 'var(--accent-mint)' : 'var(--accent-pink)';
-      badge.style.color = has ? '#3D8473' : '#C16882';
+      let label = '未配置';
+      let active = false;
+      if (s.aiMode === 'server' || (s.aiMode === 'auto' && (s.aiServerUrl || location.hostname.includes('vercel')))) {
+        label = '后端代理'; active = true;
+      } else if (s.aiMode === 'client' && s.aiKey) {
+        label = '直连模式'; active = true;
+      } else if (s.aiMode === 'auto' && s.aiKey) {
+        label = '直连模式'; active = true;
+      } else if (s.aiMode === 'mock') {
+        label = '本地示例';
+      }
+      badge.textContent = label;
+      badge.style.background = active ? 'var(--accent-mint)' : 'var(--accent-pink)';
+      badge.style.color = active ? '#3D8473' : '#C16882';
     }
     refreshKeyBadge();
 
+    function refreshAuthMenu() {
+      const badge = document.getElementById('authBadge');
+      const name = document.getElementById('authMenuName');
+      if (currentUser) {
+        name.textContent = '账号中心 / 退出登录';
+        badge.textContent = '已登录';
+        badge.style.background = 'var(--accent-mint)';
+        badge.style.color = '#3D8473';
+      } else {
+        name.textContent = '登录 / 注册';
+        badge.textContent = '访客';
+        badge.style.background = 'var(--accent-pink)';
+        badge.style.color = '#C16882';
+      }
+    }
+    refreshAuthMenu();
+
+    document.getElementById('authMenu').addEventListener('click', () => {
+      if (!currentUser) {
+        location.href = 'auth.html';
+        return;
+      }
+      if (confirm('是否退出当前账号？')) {
+        App.auth.logout();
+        App.toast('已退出登录');
+        setTimeout(() => location.reload(), 500);
+      }
+    });
+
     const modal = document.getElementById('keyModal');
+
+    function syncModeFields() {
+      const mode = document.getElementById('aiModeInput').value;
+      const serverField = document.getElementById('serverUrlField');
+      const keyField = document.getElementById('keyField');
+      const baseField = document.getElementById('baseField');
+      // 根据模式显示对应字段
+      serverField.style.display = (mode === 'auto' || mode === 'server') ? '' : 'none';
+      keyField.style.display    = (mode === 'auto' || mode === 'client') ? '' : 'none';
+      baseField.style.display   = (mode === 'auto' || mode === 'client') ? '' : 'none';
+    }
+
     document.getElementById('aiKeyMenu').addEventListener('click', () => {
-      document.getElementById('aiKeyInput').value = App.data.settings.aiKey || '';
-      document.getElementById('aiBaseInput').value = App.data.settings.aiBase || 'https://api.openai.com/v1';
-      document.getElementById('aiModelInput').value = App.data.settings.model || 'gpt-3.5-turbo';
+      const s = App.data.settings;
+      document.getElementById('aiModeInput').value = s.aiMode || 'auto';
+      document.getElementById('aiServerUrlInput').value = s.aiServerUrl || '';
+      document.getElementById('aiKeyInput').value = s.aiKey || '';
+      document.getElementById('aiBaseInput').value = s.aiBase || 'https://api.openai.com/v1';
+      document.getElementById('aiModelInput').value = s.model || 'gpt-3.5-turbo';
+      syncModeFields();
       modal.classList.add('show');
     });
+    document.getElementById('aiModeInput').addEventListener('change', syncModeFields);
     document.getElementById('keyCancel').addEventListener('click', () => modal.classList.remove('show'));
+
     document.getElementById('keySave').addEventListener('click', () => {
+      App.data.settings.aiMode = document.getElementById('aiModeInput').value;
+      App.data.settings.aiServerUrl = document.getElementById('aiServerUrlInput').value.trim();
       App.data.settings.aiKey = document.getElementById('aiKeyInput').value.trim();
       App.data.settings.aiBase = document.getElementById('aiBaseInput').value.trim() || 'https://api.openai.com/v1';
       App.data.settings.model = document.getElementById('aiModelInput').value.trim() || 'gpt-3.5-turbo';
@@ -196,6 +361,28 @@
       modal.classList.remove('show');
       App.toast('设置已保存 🌷');
     });
+
+    document.getElementById('keyTest').addEventListener('click', async () => {
+      // 临时保存当前表单值, 跑一次测试调用
+      const backup = JSON.parse(JSON.stringify(App.data.settings));
+      App.data.settings.aiMode = document.getElementById('aiModeInput').value;
+      App.data.settings.aiServerUrl = document.getElementById('aiServerUrlInput').value.trim();
+      App.data.settings.aiKey = document.getElementById('aiKeyInput').value.trim();
+      App.data.settings.aiBase = document.getElementById('aiBaseInput').value.trim() || 'https://api.openai.com/v1';
+      App.data.settings.model = document.getElementById('aiModelInput').value.trim() || 'gpt-3.5-turbo';
+
+      App.toast('正在测试 …');
+      const r = await App.callAI(
+        [{ role: 'user', content: '请用一句温柔的话问候我' }],
+        '（本地示例）你好呀，今天也要温柔地对待自己～'
+      );
+      // 不持久化, 还原 settings
+      App.data.settings = backup;
+      if (r.mode === 'server') alert('✓ 后端代理可用，已成功调用真实 AI：\n\n' + r.text);
+      else if (r.mode === 'client') alert('✓ 浏览器直连可用，已成功调用真实 AI：\n\n' + r.text);
+      else alert('⚠ 未连上真实 AI，当前为本地示例：\n\n' + r.text);
+    });
+
     modal.addEventListener('click', e => {
       if (e.target === modal) modal.classList.remove('show');
     });

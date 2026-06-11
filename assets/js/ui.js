@@ -18,11 +18,11 @@ const UI = (() => {
 
   function tabBar(active) {
     const tabs = [
-      { key: 'home',    label: '首页', icon: '🏠', href: 'index.html' },
-      { key: 'checkin', label: '打卡', icon: '✅', href: 'checkin.html' },
-      { key: 'review',  label: '复盘', icon: '📝', href: 'review.html' },
-      { key: 'ai',      label: 'AI',  icon: '✨', href: 'ai.html' },
-      { key: 'me',      label: '我的', icon: '🌸', href: 'me.html' }
+      { key: 'home',      label: '首页',   icon: '🏠', href: 'index.html' },
+      { key: 'checkin',   label: '打卡',   icon: '✅', href: 'checkin.html' },
+      { key: 'community', label: '社区',   icon: '🌷', href: 'community.html' },
+      { key: 'coach',     label: '锦汐AI', icon: '✨', href: 'coach.html' },
+      { key: 'me',        label: '我的',   icon: '🌸', href: 'me.html' }
     ];
     return `
       <nav class="tab-bar">
@@ -78,6 +78,16 @@ const UI = (() => {
     const shell = document.querySelector('.app-shell');
     if (shell) shell.insertAdjacentHTML('afterbegin', brandHeader());
     document.body.insertAdjacentHTML('beforeend', tabBar(activeTab));
+    registerServiceWorker();
+  }
+
+  function registerServiceWorker() {
+    if (!('serviceWorker' in navigator)) return;
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').catch(() => {
+        // 静默失败：部分本地 file:// 打开方式不支持 Service Worker。
+      });
+    });
   }
 
   return { brandHeader, tabBar, ringDef, progressRing, injectShared };

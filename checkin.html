@@ -6,12 +6,45 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#F2F7FE">
   <title>汐光自律 · 每日打卡</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="assets/icons/icon.svg">
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
   <main class="app-shell fade-in">
     <!-- 完成率小卡 -->
     <section class="card" id="rateCard"></section>
+
+    <!-- 自定义习惯 -->
+    <section class="card">
+      <div class="card-title">
+        <span class="card-title-text"><span class="icon"></span>自定义打卡习惯</span>
+        <span class="card-action btn-link" id="applyHabitsBtn">↺ 把今日习惯加入清单</span>
+      </div>
+      <div class="habit-designer">
+        <div class="row">
+          <input type="text" id="habitName" placeholder="例如：背 30 个英文单词" maxlength="30">
+          <div class="freq-toggle" id="freqToggle">
+            <span class="opt active" data-v="daily">每天</span>
+            <span class="opt" data-v="weekly">指定日</span>
+          </div>
+        </div>
+        <div class="row">
+          <span class="muted">图标：</span>
+          <div class="emoji-picker" id="emojiPicker"></div>
+        </div>
+        <div class="row">
+          <span class="muted">配色：</span>
+          <div class="color-picker" id="colorPicker"></div>
+        </div>
+        <div class="row" id="weekdayRow" style="display:none">
+          <span class="muted">周几：</span>
+          <div class="weekday-picker" id="weekdayPicker"></div>
+        </div>
+        <button class="btn-primary" style="width:auto;padding:10px 18px;align-self:flex-start" id="addHabitBtn">+ 保存为我的习惯</button>
+      </div>
+      <div class="habit-list" id="habitList" style="margin-top:14px"></div>
+    </section>
 
     <!-- 添加任务 -->
     <section class="card">
@@ -40,6 +73,99 @@
   <script>
     UI.injectShared('checkin');
 
+    // ============== 自定义习惯设计器 ==============
+    const EMOJIS = ['✨','🌅','💧','🏃‍♀️','📖','✍️','🧘‍♀️','🌙','🌷','📚','🥗','💪','🎯','🌸','☀️','🌱','🍵','🧴'];
+    const COLORS = ['#6FB1F0','#A8C8EC','#F4C9D5','#BFE4D9','#FFDDB0','#D5C5F0','#FFC7B8'];
+    let pickedEmoji = '✨';
+    let pickedColor = '#6FB1F0';
+    let pickedFreq = 'daily';
+    let pickedDays = new Set([1,2,3,4,5,6,7]);
+
+    function renderEmojiPicker() {
+      document.getElementById('emojiPicker').innerHTML = EMOJIS.map(e =>
+        `<span class="emoji-pick ${e === pickedEmoji ? 'active' : ''}" data-v="${e}">${e}</span>`).join('');
+    }
+    function renderColorPicker() {
+      document.getElementById('colorPicker').innerHTML = COLORS.map(c =>
+        `<span class="color-pick ${c === pickedColor ? 'active' : ''}" data-v="${c}" style="background:${c}"></span>`).join('');
+    }
+    function renderWeekdayPicker() {
+      const labels = ['一','二','三','四','五','六','日'];
+      document.getElementById('weekdayPicker').innerHTML = labels.map((l, i) =>
+        `<span class="weekday-pick ${pickedDays.has(i+1) ? 'active' : ''}" data-v="${i+1}">${l}</span>`).join('');
+    }
+    renderEmojiPicker(); renderColorPicker(); renderWeekdayPicker();
+
+    document.getElementById('emojiPicker').addEventListener('click', e => {
+      const el = e.target.closest('.emoji-pick'); if (!el) return;
+      pickedEmoji = el.dataset.v;
+      renderEmojiPicker();
+    });
+    document.getElementById('colorPicker').addEventListener('click', e => {
+      const el = e.target.closest('.color-pick'); if (!el) return;
+      pickedColor = el.dataset.v;
+      renderColorPicker();
+    });
+    document.getElementById('freqToggle').addEventListener('click', e => {
+      const el = e.target.closest('.opt'); if (!el) return;
+      pickedFreq = el.dataset.v;
+      document.querySelectorAll('#freqToggle .opt').forEach(o => o.classList.toggle('active', o.dataset.v === pickedFreq));
+      document.getElementById('weekdayRow').style.display = (pickedFreq === 'weekly') ? '' : 'none';
+    });
+    document.getElementById('weekdayPicker').addEventListener('click', e => {
+      const el = e.target.closest('.weekday-pick'); if (!el) return;
+      const v = +el.dataset.v;
+      if (pickedDays.has(v)) pickedDays.delete(v); else pickedDays.add(v);
+      renderWeekdayPicker();
+    });
+
+    document.getElementById('addHabitBtn').addEventListener('click', () => {
+      const name = document.getElementById('habitName').value.trim();
+      if (!name) { App.toast('请填写习惯名称'); return; }
+      App.addCustomHabit({
+        name, emoji: pickedEmoji, color: pickedColor,
+        freq: pickedFreq, weekdays: Array.from(pickedDays)
+      });
+      document.getElementById('habitName').value = '';
+      App.toast('已保存为我的习惯 🌷');
+      renderHabits();
+    });
+
+    function renderHabits() {
+      const list = App.listCustomHabits();
+      const ctn = document.getElementById('habitList');
+      if (!list.length) {
+        ctn.innerHTML = '<div class="muted" style="text-align:center;padding:8px">还没有自定义习惯，做一个属于你的小习惯吧 🌱</div>';
+        return;
+      }
+      const dayLabels = ['一','二','三','四','五','六','日'];
+      ctn.innerHTML = list.map(h => `
+        <div class="habit-card" data-id="${h.id}">
+          <div class="h-emoji" style="background:${h.color}33;color:${h.color}">${h.emoji}</div>
+          <div class="h-info">
+            <div class="h-name">${h.name}</div>
+            <div class="h-meta">${h.freq === 'daily' ? '每天' : '周' + (h.weekdays || []).map(d => dayLabels[d-1]).join('/')}</div>
+          </div>
+          <button class="h-del" data-act="del">✕</button>
+        </div>`).join('');
+      ctn.querySelectorAll('.habit-card').forEach(c => {
+        c.querySelector('[data-act="del"]').addEventListener('click', () => {
+          if (confirm('确认删除该习惯？')) {
+            App.deleteCustomHabit(c.dataset.id);
+            renderHabits();
+          }
+        });
+      });
+    }
+    renderHabits();
+
+    document.getElementById('applyHabitsBtn').addEventListener('click', () => {
+      const n = App.applyHabitsToToday();
+      App.toast(n ? `已加入 ${n} 个习惯到今日清单` : '今日清单已包含全部习惯');
+      renderAll();
+    });
+
+    // ============== 原任务列表逻辑 ==============
     const presets = [
       { name: '早起', emoji: '🌅' },
       { name: '喝水 8 杯', emoji: '💧' },

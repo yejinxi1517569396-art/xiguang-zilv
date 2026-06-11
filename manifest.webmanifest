@@ -1,0 +1,21 @@
+{
+  "name": "汐光自律",
+  "short_name": "汐光自律",
+  "description": "温柔的自律打卡与每日复盘工具",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F2F7FE",
+  "theme_color": "#6FB1F0",
+  "icons": [
+    {
+      "src": "assets/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "lifestyle"],
+  "lang": "zh-CN"
+}

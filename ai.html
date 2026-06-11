@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#F2F7FE">
   <title>汐光自律 · AI 助手</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="assets/icons/icon.svg">
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
@@ -143,8 +145,9 @@
       const out = document.getElementById('reviewOutput');
       out.textContent = result.text;
 
-      if (result.mock) setStatus('reviewStatusText', '🌷 当前为本地示例（在【我的】填入 Key 后自动调用真实 AI）');
-      else setStatus('reviewStatusText', '✓ 已由 AI 生成');
+      if (result.mode === 'server') setStatus('reviewStatusText', '✓ 已由真实 AI 生成（后端代理模式）');
+      else if (result.mode === 'client') setStatus('reviewStatusText', '✓ 已由真实 AI 生成（浏览器直连模式）');
+      else setStatus('reviewStatusText', '🌷 当前为本地示例（在【我的】配置后端或 API Key 即可调用真实 AI）');
 
       // 保存
       App.data.aiReviews.unshift({
@@ -186,8 +189,9 @@
       const out = document.getElementById('planOutput');
       out.textContent = result.text;
 
-      if (result.mock) setStatus('planStatusText', '🌷 当前为本地示例（在【我的】填入 Key 后自动调用真实 AI）');
-      else setStatus('planStatusText', '✓ 已由 AI 生成');
+      if (result.mode === 'server') setStatus('planStatusText', '✓ 已由真实 AI 生成（后端代理模式）');
+      else if (result.mode === 'client') setStatus('planStatusText', '✓ 已由真实 AI 生成（浏览器直连模式）');
+      else setStatus('planStatusText', '🌷 当前为本地示例（在【我的】配置后端或 API Key 即可调用真实 AI）');
 
       // 存历史
       App.data.aiPlans.unshift({
